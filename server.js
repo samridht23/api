@@ -4,10 +4,27 @@ const prisma = new PrismaClient();
 const app = express();
 
 async function main() {
-  const allUsers = await prisma.user.findMany();
-  console.log(allUsers);
-}
+  await prisma.user.create({
+    data: {
+      name: "Alice",
+      email: "alice@prisma.io",
+      posts: {
+        create: { title: "Hello World" },
+      },
+      profile: {
+        create: { bio: "I like turtles" },
+      },
+    },
+  });
 
+  const allUsers = await prisma.user.findMany({
+    include: {
+      posts: true,
+      profile: true,
+    },
+  });
+  console.dir(allUsers, { depth: null });
+}
 main()
   .then(async () => {
     await prisma.$disconnect();
